@@ -71,7 +71,7 @@ snake_game/
 ---
 
 ## 🐍 Créditos
-- Código y arte: [Tu Nombre]
+- Código y arte: DevCreador
 - Motor: [Pygame](https://www.pygame.org/)
 
 ---
