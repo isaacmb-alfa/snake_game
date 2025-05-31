@@ -1,6 +1,20 @@
-assets-copia
-.qodo
-dist
-build
-_pycache_*
-main.spec
+# Ignorar carpetas de build y distribución
+build/
+dist/
+snake_portable/
+__pycache__/
+*.pyc
+
+# Ignorar archivos de PyInstaller
+*.spec
+
+# Ignorar archivos temporales de sistema
+.DS_Store
+Thumbs.db
+
+# Ignorar entornos virtuales (si usas)
+venv/
+.env/
+
+# Ignorar backups o copias
+assets-copia/
