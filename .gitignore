@@ -1,1 +1,6 @@
 assets-copia
+.qodo
+dist
+build
+_pycache_*
+main.spec

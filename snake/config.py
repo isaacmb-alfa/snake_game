@@ -2,7 +2,7 @@ import pygame
 from pathlib import Path
 
 # Constantes de configuración de la ventana y el juego
-WIDTH, HEIGHT = 600, 600  # Tamaño de la ventana
+WIDTH, HEIGHT = 800, 700# Tamaño de la ventana
 GRID_SIZE = 20             # Tamaño de cada celda de la cuadrícula
 GRID_WIDTH = WIDTH // GRID_SIZE   # Número de celdas horizontales
 GRID_HEIGHT = HEIGHT // GRID_SIZE # Número de celdas verticales

@@ -4,6 +4,13 @@ from snake.config import WIDTH, HEIGHT, SNAKE_SPEED, BLACK, WHITE, UP, DOWN, LEF
 from snake.sprites import create_default_sprites, load_sprites
 from snake.snake import Snake
 from snake.food import Food
+import shutil
+import os
+
+# Limpia la caché __pycache__ al iniciar
+pycache_path = os.path.join(os.path.dirname(__file__), "snake", "__pycache__")
+if os.path.exists(pycache_path):
+    shutil.rmtree(pycache_path)
 
 
 def main():
