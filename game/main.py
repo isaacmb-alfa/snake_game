@@ -12,6 +12,19 @@ pycache_path = os.path.join(os.path.dirname(__file__), "snake", "__pycache__")
 if os.path.exists(pycache_path):
     shutil.rmtree(pycache_path)
 
+# Ajuste para que la ruta base de assets sea relativa a este archivo
+ASSETS_PATH = os.path.join(os.path.dirname(__file__), "assets", "img")
+
+# Monkeypatch para que pygame.image.load busque en assets/img por defecto
+import pygame
+_original_load = pygame.image.load
+
+def _patched_load(path, *args, **kwargs):
+    if not os.path.isabs(path) and not os.path.exists(path):
+        path = os.path.join(ASSETS_PATH, path)
+    return _original_load(path, *args, **kwargs)
+pygame.image.load = _patched_load
+
 
 def main():
     pygame.init()

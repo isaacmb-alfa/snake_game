@@ -5,14 +5,14 @@ from .config import GRID_SIZE, GREEN, YELLOW, WHITE, RED
 SPRITES = {}
 
 SPRITES_PATHS_EXTRA_TURNS = {
-    'body_turn_right_up': os.path.join('assets', 'snake_body_turn_right_up.png'),
-    'body_turn_up_right': os.path.join('assets', 'snake_body_turn_up_right.png'),
-    'body_turn_left_up': os.path.join('assets', 'snake_body_turn_left_up.png'),
-    'body_turn_up_left': os.path.join('assets', 'snake_body_turn_up_left.png'),
-    'body_turn_right_down': os.path.join('assets', 'snake_body_turn_right_down.png'),
-    'body_turn_down_right': os.path.join('assets', 'snake_body_turn_down_right.png'),
-    'body_turn_left_down': os.path.join('assets', 'snake_body_turn_left_down.png'),
-    'body_turn_down_left': os.path.join('assets', 'snake_body_turn_down_left.png'),
+    'body_turn_right_up': os.path.join('assets', 'img', 'snake_body_turn_right_up.png'),
+    'body_turn_up_right': os.path.join('assets', 'img', 'snake_body_turn_up_right.png'),
+    'body_turn_left_up': os.path.join('assets', 'img', 'snake_body_turn_left_up.png'),
+    'body_turn_up_left': os.path.join('assets', 'img', 'snake_body_turn_up_left.png'),
+    'body_turn_right_down': os.path.join('assets', 'img', 'snake_body_turn_right_down.png'),
+    'body_turn_down_right': os.path.join('assets', 'img', 'snake_body_turn_down_right.png'),
+    'body_turn_left_down': os.path.join('assets', 'img', 'snake_body_turn_left_down.png'),
+    'body_turn_down_left': os.path.join('assets', 'img', 'snake_body_turn_down_left.png'),
 }
 
 def recreate_turn_sprites():
@@ -177,17 +177,17 @@ def load_sprites():
     import os
     global SPRITES
     sprites_paths = {
-        'head': os.path.join('assets', 'snake_head.png'),
-        'body': os.path.join('assets', 'snake_body.png'),
-        'body_h': os.path.join('assets', 'snake_body_h.png'),
-        'body_v': os.path.join('assets', 'snake_body_v.png'),
-        'tail': os.path.join('assets', 'snake_tail.png'),
-        'food': os.path.join('assets', 'food.png'),
+        'head': os.path.join('assets', 'img', 'snake_head.png'),
+        'body': os.path.join('assets', 'img', 'snake_body.png'),
+        'body_h': os.path.join('assets', 'img', 'snake_body_h.png'),
+        'body_v': os.path.join('assets', 'img', 'snake_body_v.png'),
+        'tail': os.path.join('assets', 'img', 'snake_tail.png'),
+        'food': os.path.join('assets', 'img', 'food.png'),
         # Solo los 4 giros originales, los 8 nuevos se agregan abajo
-        'body_turn_up_right': os.path.join('assets', 'snake_body_turn_up_right.png'),
-        'body_turn_up_left': os.path.join('assets', 'snake_body_turn_up_left.png'),
-        'body_turn_down_right': os.path.join('assets', 'snake_body_turn_down_right.png'),
-        'body_turn_down_left': os.path.join('assets', 'snake_body_turn_down_left.png'),
+        'body_turn_up_right': os.path.join('assets', 'img', 'snake_body_turn_up_right.png'),
+        'body_turn_up_left': os.path.join('assets', 'img', 'snake_body_turn_up_left.png'),
+        'body_turn_down_right': os.path.join('assets', 'img', 'snake_body_turn_down_right.png'),
+        'body_turn_down_left': os.path.join('assets', 'img', 'snake_body_turn_down_left.png'),
     }
     # Agregar los 8 sprites de giro extendidos
     sprites_paths.update(SPRITES_PATHS_EXTRA_TURNS)

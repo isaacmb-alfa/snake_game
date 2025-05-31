@@ -3,7 +3,7 @@
 
 # Cambia el nombre del icono aquí si usas otro
 $icon = "snake.ico"
-$main = "main.py"
+$main = "game/main.py"
 
 # Verifica que el icono existe
 if (!(Test-Path $icon)) {
@@ -35,11 +35,9 @@ New-Item -ItemType Directory -Path $portablePath | Out-Null
 
 # Copia el .exe
 Copy-Item -Path $exePath -Destination $portablePath
-# Copia assets
-Copy-Item -Path "assets" -Destination $portablePath -Recurse
-# Copia snake (sin __pycache__)
-Copy-Item -Path "snake" -Destination $portablePath -Recurse
-Remove-Item -Path "$portablePath/snake/__pycache__" -Recurse -Force -ErrorAction SilentlyContinue
+# Copia la carpeta game completa (incluye assets y código fuente, sin __pycache__)
+Copy-Item -Path "game" -Destination $portablePath -Recurse
+Remove-Item -Path "$portablePath/game/__pycache__" -Recurse -Force -ErrorAction SilentlyContinue
 
 # Crea el instalador autoextraíble usando 7-Zip (debe estar en el PATH)
 $installerName = "snake_installer.exe"
