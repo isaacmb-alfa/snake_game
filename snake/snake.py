@@ -43,63 +43,62 @@ class Snake:
     def _get_segment_type(self, i):
         if i == 0 or i == len(self.positions) - 1:
             return None
-    
+
         prev_pos = self.positions[i-1]
         current_pos = self.positions[i]
         next_pos = self.positions[i+1]
-    
-        dx1 = current_pos[0] - prev_pos[0]
-        dy1 = current_pos[1] - prev_pos[1]
-        dx2 = next_pos[0] - current_pos[0]
-        dy2 = next_pos[1] - current_pos[1]
-    
-        if dx1 != 0: dx1 = dx1 // abs(dx1)
-        if dy1 != 0: dy1 = dy1 // abs(dy1)
-        if dx2 != 0: dx2 = dx2 // abs(dx2)
-        if dy2 != 0: dy2 = dy2 // abs(dy2)
-    
-        # Debug: imprimir valores en los giros
-        if (dx1, dy1) != (dx2, dy2):
-            print(f"DEBUG - Giro detectado en pos {current_pos}:")
-            print(f"  Dirección anterior (dx1,dy1): ({dx1},{dy1})")
-            print(f"  Dirección siguiente (dx2,dy2): ({dx2},{dy2})")
 
-        # Segmentos rectos
-        if (dx1, dy1) == (dx2, dy1):
-            if dx1 != 0 and dy1 == 0:
-                return 'body_h'  # 🠒🠒 o 🠐🠐
-            elif dx1 == 0 and dy1 != 0:
-                return 'body_v'  # 🠑🠑 o 🠓🠓
+        # Dirección de entrada (de prev a current)
+        dx_in = current_pos[0] - prev_pos[0]
+        dy_in = current_pos[1] - prev_pos[1]
+        # Dirección de salida (de current a next)
+        dx_out = next_pos[0] - current_pos[0]
+        dy_out = next_pos[1] - current_pos[1]
+
+        # Normalizar a -1, 0, 1
+        if dx_in != 0: dx_in = dx_in // abs(dx_in)
+        if dy_in != 0: dy_in = dy_in // abs(dy_in)
+        if dx_out != 0: dx_out = dx_out // abs(dx_out)
+        if dy_out != 0: dy_out = dy_out // abs(dy_out)
+
+        # Rectos
+        if (dx_in, dy_in) == (dx_out, dy_out):
+            if dx_in != 0 and dy_in == 0:
+                return 'body_h'  # Horizontal
+            elif dx_in == 0 and dy_in != 0:
+                return 'body_v'  # Vertical
             else:
                 return 'body'
 
-        # Giros horizontales y verticales, cada uno con su condición separada y corregida
-        # 🠒🠑 (derecha-arriba)
-        if dx1 == 1 and dy1 == 0 and dx2 == 0 and dy2 == -1:
-            return 'body_turn_up_right'  # derecha->arriba
-        # 🠐🠑 (izquierda-arriba)
-        if dx1 == -1 and dy1 == 0 and dx2 == 0 and dy2 == -1:
-            return 'body_turn_up_left'  # izquierda->arriba
-        # 🠒🠓 (derecha-abajo)
-        if dx1 == 1 and dy1 == 0 and dx2 == 0 and dy2 == 1:
-            return 'body_turn_down_right'  # derecha->abajo
-        # 🠐🠓 (izquierda-abajo)
-        if dx1 == -1 and dy1 == 0 and dx2 == 0 and dy2 == 1:
-            return 'body_turn_down_left'  # izquierda->abajo
-        # 🠑🠒 (arriba-derecha)
-        if dx1 == 0 and dy1 == -1 and dx2 == 1 and dy2 == 0:
-            return 'body_turn_down_right'  # arriba->derecha (corrige: antes era up_right)
-        # 🠑🠐 (arriba-izquierda)
-        if dx1 == 0 and dy1 == -1 and dx2 == -1 and dy2 == 0:
-            return 'body_turn_down_left'  # arriba->izquierda (corrige: antes era up_left)
-        # 🠓🠒 (abajo-derecha)
-        if dx1 == 0 and dy1 == 1 and dx2 == 1 and dy2 == 0:
-            return 'body_turn_up_right'  # abajo->derecha (corrige: antes era down_right)
-        # 🠓🠐 (abajo-izquierda)
-        if dx1 == 0 and dy1 == 1 and dx2 == -1 and dy2 == 0:
-            return 'body_turn_up_left'  # abajo->izquierda (corrige: antes era down_left)
+        # Mapear (entrada, salida) a sprite de curva
+        # Ahora hay 8 sprites distintos para los 8 giros posibles
+        turns = {
+            # Derecha -> Arriba
+            ((1,0),(0,-1)): 'body_turn_right_up',
+            # Arriba -> Derecha
+            ((0,-1),(1,0)): 'body_turn_up_right',
+            # Izquierda -> Arriba
+            ((-1,0),(0,-1)): 'body_turn_left_up',
+            # Arriba -> Izquierda
+            ((0,-1),(-1,0)): 'body_turn_up_left',
+            # Derecha -> Abajo
+            ((1,0),(0,1)): 'body_turn_right_down',
+            # Abajo -> Derecha
+            ((0,1),(1,0)): 'body_turn_down_right',
+            # Izquierda -> Abajo
+            ((-1,0),(0,1)): 'body_turn_left_down',
+            # Abajo -> Izquierda
+            ((0,1),(-1,0)): 'body_turn_down_left',
+        }
+        key = ((dx_in, dy_in), (dx_out, dy_out))
+        if key in turns:
+            return turns[key]
+        # Si no está, prueba la inversa (por seguridad)
+        key_inv = ((dx_out, dy_out), (dx_in, dy_in))
+        if key_inv in turns:
+            return turns[key_inv]
 
-        print(f"ADVERTENCIA: Giro no detectado: ({dx1},{dy1}) -> ({dx2},{dy2}) en pos {current_pos}")
+        print(f"ADVERTENCIA: Giro no detectado: entrada ({dx_in},{dy_in}) salida ({dx_out},{dy_out}) en pos {current_pos}")
         return 'body'
 
     def render(self, surface):
@@ -129,21 +128,18 @@ class Snake:
                 surface.blit(self.tail_sprites[tail_direction], rect)
             else:
                 segment_type = self._get_segment_type(i)
-                # --- Curvas ---
-                # Usamos siempre el sprite 'body_turn_up_right' y lo rotamos según el tipo de giro
-                # Ver comentarios arriba para entender cada caso
-                angle = None
-                if segment_type == 'body_turn_up_right':      # 🠒🠑 o 🠑🠒
-                    angle = 0
-                elif segment_type == 'body_turn_down_right':  # 🠒🠓 o 🠓🠒
-                    angle = 90
-                elif segment_type == 'body_turn_down_left':   # 🠐🠓 o 🠓🠐
-                    angle = 180
-                elif segment_type == 'body_turn_up_left':     # 🠐🠑 o 🠑🠐
-                    angle = 270
-                if angle is not None:
-                    sprite = pygame.transform.rotate(SPRITES['body_turn_up_right'], angle)
-                    surface.blit(sprite, rect)
+                # --- Curvas: ahora hay 8 tipos ---
+                if segment_type in [
+                    'body_turn_right_up',
+                    'body_turn_up_right',
+                    'body_turn_left_up',
+                    'body_turn_up_left',
+                    'body_turn_right_down',
+                    'body_turn_down_right',
+                    'body_turn_left_down',
+                    'body_turn_down_left',
+                ]:
+                    surface.blit(SPRITES[segment_type], rect)
                 # --- Rectos ---
                 elif segment_type == 'body_h':  # 🠒🠒 o 🠐🠐
                     surface.blit(SPRITES['body_h'], rect)

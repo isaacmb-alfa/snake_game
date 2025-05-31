@@ -4,6 +4,17 @@ from .config import GRID_SIZE, GREEN, YELLOW, WHITE, RED
 
 SPRITES = {}
 
+SPRITES_PATHS_EXTRA_TURNS = {
+    'body_turn_right_up': os.path.join('assets', 'snake_body_turn_right_up.png'),
+    'body_turn_up_right': os.path.join('assets', 'snake_body_turn_up_right.png'),
+    'body_turn_left_up': os.path.join('assets', 'snake_body_turn_left_up.png'),
+    'body_turn_up_left': os.path.join('assets', 'snake_body_turn_up_left.png'),
+    'body_turn_right_down': os.path.join('assets', 'snake_body_turn_right_down.png'),
+    'body_turn_down_right': os.path.join('assets', 'snake_body_turn_down_right.png'),
+    'body_turn_left_down': os.path.join('assets', 'snake_body_turn_left_down.png'),
+    'body_turn_down_left': os.path.join('assets', 'snake_body_turn_down_left.png'),
+}
+
 def recreate_turn_sprites():
     """Force recreation of the turn sprites and save them to assets folder"""
     from pathlib import Path
@@ -163,7 +174,6 @@ def create_turn_sprite_down_left():
     return surface
 
 def load_sprites():
-    # Solo carga los sprites, no los crea
     import os
     global SPRITES
     sprites_paths = {
@@ -173,16 +183,24 @@ def load_sprites():
         'body_v': os.path.join('assets', 'snake_body_v.png'),
         'tail': os.path.join('assets', 'snake_tail.png'),
         'food': os.path.join('assets', 'food.png'),
+        # Solo los 4 giros originales, los 8 nuevos se agregan abajo
         'body_turn_up_right': os.path.join('assets', 'snake_body_turn_up_right.png'),
         'body_turn_up_left': os.path.join('assets', 'snake_body_turn_up_left.png'),
         'body_turn_down_right': os.path.join('assets', 'snake_body_turn_down_right.png'),
-        'body_turn_down_left': os.path.join('assets', 'snake_body_turn_down_left.png')
+        'body_turn_down_left': os.path.join('assets', 'snake_body_turn_down_left.png'),
     }
+    # Agregar los 8 sprites de giro extendidos
+    sprites_paths.update(SPRITES_PATHS_EXTRA_TURNS)
     turn_debug_colors = {
         'body_turn_up_right': (255, 0, 0),
         'body_turn_up_left': (0, 255, 0),
         'body_turn_down_right': (0, 0, 255),
-        'body_turn_down_left': (255, 255, 0)
+        'body_turn_down_left': (255, 255, 0),
+        # Colores para los nuevos
+        'body_turn_right_up': (255, 128, 128),
+        'body_turn_left_up': (128, 255, 128),
+        'body_turn_right_down': (128, 128, 255),
+        'body_turn_left_down': (255, 255, 128),
     }
     for name, path in sprites_paths.items():
         try:
