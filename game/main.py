@@ -88,7 +88,7 @@ def main():
                     elif event.key == pygame.K_RIGHT:
                         snake.change_direction(RIGHT)
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if pause_button_rect.collidepoint(event.pos):
+                if not game_over and pause_button_rect.collidepoint(event.pos):
                     paused = not paused
 
         if not game_over and not paused:
