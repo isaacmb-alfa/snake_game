@@ -36,11 +36,17 @@ def main():
     # create_default_sprites()
     load_sprites()
 
-    font = pygame.font.SysFont('Arial', 25)
+    font = pygame.font.Font('assets/fonts/8bitOperatorPlus8-Regular.ttf', 25)
     snake = Snake()
     food = Food(snake.positions)
     score = 0
     game_over = False
+
+    # Cargar tile de fondo
+    try:
+        tile_img = pygame.image.load('tile.png').convert()
+    except Exception:
+        tile_img = None
 
     while True:
         for event in pygame.event.get():
@@ -72,11 +78,34 @@ def main():
                 food = Food(snake.positions)
                 score += 1
 
-        screen.fill(BLACK)
+        # Dibuja el fondo con tiles
+        if tile_img:
+            for x in range(0, WIDTH, tile_img.get_width()):
+                for y in range(0, HEIGHT, tile_img.get_height()):
+                    screen.blit(tile_img, (x, y))
+        else:
+            screen.fill(BLACK)
         snake.render(screen)
         food.render(screen)
-        score_text = font.render(f"Score: {score}", True, WHITE)
-        screen.blit(score_text, (5, 5))
+        # Estilo condicional del score
+        if score < 6:
+            score_color = WHITE
+        elif 6 <= score <= 10:
+            score_color = (255, 255, 0)  # Amarillo
+        elif 11 <= score <= 20:
+            score_color = (0, 255, 0)    # Verde
+        else:
+            score_color = (128, 0, 128)  # Morado
+
+        score_text = font.render(f"Score: {score}", True, score_color)
+        score_rect = score_text.get_rect(center=(WIDTH // 2, 40))
+        # Dibujar rectángulo transparente con borde blanco
+        rect_surface = pygame.Surface((score_rect.width + 20, score_rect.height + 10), pygame.SRCALPHA) #rectangulo transparente
+        pygame.draw.rect(rect_surface, (0,0,0,0), rect_surface.get_rect())  # Fondo totalmente transparente
+        pygame.draw.rect(rect_surface, (255,255,255), rect_surface.get_rect(), 1)  # Borde blanco
+        # Blit del rectángulo y luego el texto
+        screen.blit(rect_surface, (score_rect.x - 10, score_rect.y - 5))
+        screen.blit(score_text, score_rect)
         if game_over:
             game_over_text = font.render("Game Over! Press SPACE to restart", True, WHITE)
             screen.blit(game_over_text, (WIDTH // 2 - game_over_text.get_width() // 2, HEIGHT // 2))
