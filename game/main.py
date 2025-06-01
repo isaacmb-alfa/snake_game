@@ -16,7 +16,6 @@ if os.path.exists(pycache_path):
 ASSETS_PATH = os.path.join(os.path.dirname(__file__), "assets", "img")
 
 # Monkeypatch para que pygame.image.load busque en assets/img por defecto
-import pygame
 _original_load = pygame.image.load
 
 def _patched_load(path, *args, **kwargs):
@@ -41,6 +40,25 @@ def main():
     food = Food(snake.positions)
     score = 0
     game_over = False
+    paused = False
+    pause_button_rect = pygame.Rect(WIDTH - 50, 10, 40, 40)
+    pause_font = pygame.font.SysFont('Arial', 32)
+
+    # Cargar imágenes de botón de pausa/play si existen
+    try:
+        pause_btn_img = pygame.image.load('pause_btn.png').convert_alpha()
+    except Exception:
+        pause_btn_img = None
+    try:
+        play_btn_img = pygame.image.load('play_btn.png').convert_alpha()
+    except Exception:
+        play_btn_img = None
+
+    # Fuente para el botón de pausa/play (distinta al score)
+    try:
+        pause_font = pygame.font.Font('assets/fonts/8bitOperatorPlus8-Bold.ttf', 32)
+    except Exception:
+        pause_font = pygame.font.SysFont('Arial', 32)
 
     # Cargar tile de fondo
     try:
@@ -69,8 +87,11 @@ def main():
                         snake.change_direction(LEFT)
                     elif event.key == pygame.K_RIGHT:
                         snake.change_direction(RIGHT)
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if pause_button_rect.collidepoint(event.pos):
+                    paused = not paused
 
-        if not game_over:
+        if not game_over and not paused:
             if not snake.update():
                 game_over = True
             if snake.get_head_position() == food.position:
@@ -87,6 +108,40 @@ def main():
             screen.fill(BLACK)
         snake.render(screen)
         food.render(screen)
+
+        # Superposición negra semitransparente al pausar
+        if paused:
+            overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+            overlay.fill((0, 0, 0, 160))  # 50% opacidad
+            screen.blit(overlay, (0, 0))
+            # Texto "PAUSE" centrado
+            pause_text_font = pygame.font.Font('assets/fonts/8bitOperatorPlus8-Bold.ttf', 100)
+            pause_text = pause_text_font.render("PAUSE", True, (255, 255, 255))
+            pause_text_rect = pause_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+            screen.blit(pause_text, pause_text_rect)    
+
+        # Botón de pausa/play (siempre visible y clickeable)
+        pygame.draw.rect(screen, (0,0,0,0), pause_button_rect)
+        pygame.draw.rect(screen, (255,255,255), pause_button_rect, 2)
+        if paused:
+            if play_btn_img:
+                btn_img = pygame.transform.smoothscale(play_btn_img, (pause_button_rect.width-6, pause_button_rect.height-6))
+                btn_rect = btn_img.get_rect(center=pause_button_rect.center)
+                screen.blit(btn_img, btn_rect)
+            else:
+                pause_text = pause_font.render('▶', True, (255,255,255))
+                pause_text_rect = pause_text.get_rect(center=pause_button_rect.center)
+                screen.blit(pause_text, pause_text_rect)
+        else:
+            if pause_btn_img:
+                btn_img = pygame.transform.smoothscale(pause_btn_img, (pause_button_rect.width-6, pause_button_rect.height-6))
+                btn_rect = btn_img.get_rect(center=pause_button_rect.center)
+                screen.blit(btn_img, btn_rect)
+            else:
+                pause_text = pause_font.render('⏸', True, (255,255,255))
+                pause_text_rect = pause_text.get_rect(center=pause_button_rect.center)
+                screen.blit(pause_text, pause_text_rect)
+
         # Estilo condicional del score
         if score < 6:
             score_color = WHITE
@@ -107,8 +162,19 @@ def main():
         screen.blit(rect_surface, (score_rect.x - 10, score_rect.y - 5))
         screen.blit(score_text, score_rect)
         if game_over:
-            game_over_text = font.render("Game Over! Press SPACE to restart", True, WHITE)
-            screen.blit(game_over_text, (WIDTH // 2 - game_over_text.get_width() // 2, HEIGHT // 2))
+            overlay_game_over = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+            overlay_game_over.fill((0, 0, 0, 150))  # 50% opacidad
+            screen.blit(overlay_game_over, (0, 0))
+            # Texto "Game Over!" centrado en rojo
+            game_over_font = pygame.font.Font('assets/fonts/8bitOperatorPlus8-Bold.ttf', 100)
+            game_over_text = game_over_font.render("Game Over!", True, (255, 0, 0))
+            game_over_rect = game_over_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 50))
+            screen.blit(game_over_text, game_over_rect)
+            # Texto de reinicio en blanco debajo
+            restart_font = pygame.font.Font('assets/fonts/8bitOperatorPlus8-Regular.ttf', 32)
+            restart_text = restart_font.render("Press SPACE to restart", True, (255, 255, 255))
+            restart_rect = restart_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 40))
+            screen.blit(restart_text, restart_rect)
         pygame.display.update()
         clock.tick(SNAKE_SPEED)
 
