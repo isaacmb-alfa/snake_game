@@ -15,6 +15,9 @@ snake_game/
 │   ├── assets/
 │   │   ├── img/           # Sprites e imágenes
 │   │   └── sounds/        # (opcional) Sonidos
+|   └── ├──fonts/           # Fuentes de texto
+│   ├── config.py          # Configuración del juego
+│   ├── constants.py       # Constantes del juego
 │   └── ...
 ├── build_exe.ps1          # Script para compilar y empaquetar
 ├── snake.ico              # Icono del juego

@@ -1,4 +1,4 @@
-import pygame
+
 from pathlib import Path
 
 # Constantes de configuración de la ventana y el juego
