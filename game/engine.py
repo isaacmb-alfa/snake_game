@@ -5,12 +5,17 @@ from snake.snake import Snake
 from snake.food import Food
 from ui import draw_score, draw_pause_overlay, draw_game_over_overlay, draw_pause_button, get_score_color
 from assets import load_font, load_image, load_tile
+from start_menu import StartMenu
 
 def run_game():
     pygame.init()
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption('Snake Game')
+
+    # Mostrar pantalla de inicio
+    menu = StartMenu()
+    menu.run(screen)
 
     load_sprites()
 
