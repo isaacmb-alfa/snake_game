@@ -5,7 +5,8 @@ from snake.snake import Snake
 from snake.food import Food
 from ui import draw_score, draw_pause_overlay, draw_game_over_overlay, draw_pause_button, get_score_color
 from assets import load_font, load_image, load_tile
-from start_menu import StartMenu
+from start_menu.start_menu import StartMenu
+from ui_pause_menu.pause_menu import PauseMenu
 
 def run_game():
     pygame.init()
@@ -16,12 +17,17 @@ def run_game():
     # Mostrar pantalla de inicio
     menu = StartMenu()
     menu.run(screen)
+    # Obtener velocidad seleccionada del menú
+    selected_speed = getattr(menu, 'selected_speed', SNAKE_SPEED)
+    base_speed = selected_speed
+    current_speed = base_speed
+    print(f"[DEBUG] Velocidad seleccionada para el juego: {selected_speed}")
 
     load_sprites()
 
     # Fuentes y recursos
     font = load_font('assets/fonts/8bitOperatorPlus8-Regular.ttf', 25)
-    pause_font = load_font('assets/fonts/8bitOperatorPlus8-Bold.ttf', 32, fallback='Arial')
+    pause_font = load_font('assets/fonts/8bitOperatorPlus8-Bold.ttf', 24, fallback='Arial')
     pause_text_font = load_font('assets/fonts/8bitOperatorPlus8-Bold.ttf', 100, fallback='Arial')
     game_over_font = load_font('assets/fonts/8bitOperatorPlus8-Bold.ttf', 100, fallback='Arial')
     restart_font = load_font('assets/fonts/8bitOperatorPlus8-Regular.ttf', 32, fallback='Arial')
@@ -35,8 +41,9 @@ def run_game():
     game_over = False
     paused = False
     pause_button_rect = pygame.Rect(WIDTH - 50, 10, 40, 40)
+    pause_menu = PauseMenu(pause_font)
     # Configuración de velocidad y dirección
-    current_speed = SNAKE_SPEED
+    current_speed = selected_speed
     boost_active = False
     key_to_direction = {
         pygame.K_UP: UP,
@@ -75,6 +82,20 @@ def run_game():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if not game_over and pause_button_rect.collidepoint(event.pos):
                     paused = not paused
+            # --- Manejo de botones de pausa ---
+            if paused and not game_over:
+                action = pause_menu.handle_event(event)
+                if action == 'continue':
+                    paused = False
+                elif action == 'restart':
+                    snake = Snake()
+                    food = Food(snake.positions)
+                    score = 0
+                    game_over = False
+                    paused = False
+                elif action == 'quit':
+                    pygame.quit()
+                    return
 
         if not game_over and not paused:
             if not snake.update():
@@ -97,7 +118,8 @@ def run_game():
         # Superposición negra semitransparente al pausar
         if paused:
             draw_pause_overlay(screen, WIDTH, HEIGHT, pause_text_font)
-
+            pause_menu.update()
+            pause_menu.draw(screen)
         # Botón de pausa/play (siempre visible y clickeable)
         draw_pause_button(screen, pause_button_rect, paused, pause_btn_img, play_btn_img, pause_font)
 
@@ -106,9 +128,11 @@ def run_game():
         draw_score(screen, font, score, score_color, WIDTH)
         if game_over:
             draw_game_over_overlay(screen, WIDTH, HEIGHT, game_over_font, restart_font)
+        # Ajustar velocidad del juego
         if boost_active and not paused and not game_over:
-            current_speed = int(SNAKE_SPEED * 2)
+            current_speed = int(base_speed * 2)
         else:
-            current_speed = SNAKE_SPEED
+            current_speed = base_speed
+            
         pygame.display.update()
         clock.tick(current_speed)

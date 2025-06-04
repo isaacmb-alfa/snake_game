@@ -1,13 +1,12 @@
 import pygame
 from snake.config import WIDTH, HEIGHT, WHITE, BLACK, GREEN, YELLOW
 from assets import load_font, load_image
-from start_menu.title import StartMenuTitle
-from start_menu.level_selector import LevelSelector
-from start_menu.toggle_option import ToggleOption
-from start_menu.music_slider import MusicSlider
-from start_menu.bg_selector import BgSelector
-from start_menu.skin_selector import SkinSelector
-
+from .title import StartMenuTitle
+from .level_selector import LevelSelector
+from .toggle_option import ToggleOption
+from .music_slider import MusicSlider
+from .bg_selector import BgSelector
+from .skin_selector import SkinSelector
 
 class StartMenu:
     def __init__(self):
@@ -31,6 +30,7 @@ class StartMenu:
         self.music_volume = 5
         self.running = True
         self.selected = None
+        
 
     def draw(self, screen):
         screen.fill(self.bg_color)
@@ -38,7 +38,7 @@ class StartMenu:
         spacing = 55
         self.title.draw(screen)
         self.level_selector.draw(screen, y, selected=(self.selected=='level'))
-        y += spacing
+        y += spacing + 10
         self.toggle_option.draw(screen, 'Sonido', self.sound_on, y, selected=(self.selected=='sound'))
         y += spacing
         self.music_slider.draw(screen, 'Música', self.music_volume, y, selected=(self.selected=='music'))
@@ -69,9 +69,15 @@ class StartMenu:
         # --- Animación de deslizamiento de nivel ---
         if hasattr(self, 'level_selector'):
             self.level_selector.update()
+            # Sincronizar el índice de nivel con el selector
+            self.level_idx = self.level_selector.level_idx
         # Actualizar velocidad seleccionada si cambia el nivel
         if hasattr(self, 'level_idx') and hasattr(self, 'level_speeds'):
+            prev_speed = getattr(self, '_last_debug_speed', None)
             self.selected_speed = self.level_speeds[self.level_idx]
+            if self.selected_speed != prev_speed:
+                print(f"[DEBUG] selected_speed cambió a: {self.selected_speed}")
+                self._last_debug_speed = self.selected_speed
 
     def run(self, screen):
         clock = pygame.time.Clock()
