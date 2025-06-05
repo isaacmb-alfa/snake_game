@@ -9,20 +9,22 @@ Juego clásico de Snake hecho en Python con Pygame.
 ```
 snake_game/
 │
-├── game/                  # Código fuente y recursos
-│   ├── main.py            # Punto de entrada
-│   ├── snake/             # Módulos del juego
+├── game/                    # Código fuente y recursos
+│   ├── main.py              # Punto de entrada
+│   ├── snake/               # Módulos del juego
 │   ├── assets/
-│   │   ├── img/           # Sprites e imágenes
-│   │   └── sounds/        # (opcional) Sonidos
-|   └── ├──fonts/           # Fuentes de texto
-│   ├── config.py          # Configuración del juego
-│   ├── constants.py       # Constantes del juego
-│   └── ...
-├── build_exe.ps1          # Script para compilar y empaquetar
-├── snake.ico              # Icono del juego
-├── .gitignore             # Archivos/carpetas a ignorar en git
-└── README.md              # (este archivo)
+│   │   ├── img/             # Sprites e imágenes
+│   │   ├── sounds/          # (opcional) Sonidos
+│   │   └── fonts/           # Fuentes de texto
+│   ├── config.py            # Configuración del juego
+│   ├── constants.py         # Constantes del juego
+│   └── ...                  # Otros archivos/módulos
+├── build_exe.ps1            # Script para compilar y empaquetar (PowerShell)
+├── build_exe.py             # Script para compilar a exe (Python)
+├── debug_installer.py       # Script para depurar el instalador
+├── snake.ico                # Icono del juego
+├── .gitignore               # Archivos/carpetas a ignorar en git
+└── README.md                # (este archivo)
 ```
 
 ---

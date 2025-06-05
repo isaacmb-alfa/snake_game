@@ -1,43 +1,56 @@
 import pygame
 import os
+import sys
+try:
+    from game.resource_util import resource_path
+except ImportError:
+    from resource_util import resource_path
 from .config import GRID_SIZE, GREEN, YELLOW, WHITE, RED
 
+# Directorio base para los sprites
+IMG_DIR = 'assets/img'
+
+# Diccionario global de sprites
 SPRITES = {}
 
 SPRITES_PATHS_EXTRA_TURNS = {
-    'body_turn_right_up': os.path.join('assets', 'img', 'snake_body_turn_right_up.png'),
-    'body_turn_up_right': os.path.join('assets', 'img', 'snake_body_turn_up_right.png'),
-    'body_turn_left_up': os.path.join('assets', 'img', 'snake_body_turn_left_up.png'),
-    'body_turn_up_left': os.path.join('assets', 'img', 'snake_body_turn_up_left.png'),
-    'body_turn_right_down': os.path.join('assets', 'img', 'snake_body_turn_right_down.png'),
-    'body_turn_down_right': os.path.join('assets', 'img', 'snake_body_turn_down_right.png'),
-    'body_turn_left_down': os.path.join('assets', 'img', 'snake_body_turn_left_down.png'),
-    'body_turn_down_left': os.path.join('assets', 'img', 'snake_body_turn_down_left.png'),
+    'body_turn_right_up': resource_path('assets/img/snake_body_turn_right_up.png'),
+    'body_turn_up_right': resource_path('assets/img/snake_body_turn_up_right.png'),
+    'body_turn_left_up': resource_path('assets/img/snake_body_turn_left_up.png'),
+    'body_turn_up_left': resource_path('assets/img/snake_body_turn_up_left.png'),
+    'body_turn_right_down': resource_path('assets/img/snake_body_turn_right_down.png'),
+    'body_turn_down_right': resource_path('assets/img/snake_body_turn_down_right.png'),
+    'body_turn_left_down': resource_path('assets/img/snake_body_turn_left_down.png'),
+    'body_turn_down_left': resource_path('assets/img/snake_body_turn_down_left.png'),
 }
 
 def recreate_turn_sprites():
-    """Force recreation of the turn sprites and save them to assets folder"""
-    from pathlib import Path
-    assets_dir = Path('assets')
-    assets_dir.mkdir(exist_ok=True)
+    """Regenera los sprites de curvas y los guarda en la carpeta de assets"""
+    base_dir = resource_path('assets/img')
+    os.makedirs(base_dir, exist_ok=True)
     
-    # Create and save the turn sprites
+    # Crear y guardar los sprites de curvas
     turn_sprites = {
         'snake_body_turn_up_right.png': create_turn_sprite_up_right(),
         'snake_body_turn_up_left.png': create_turn_sprite_up_left(),
         'snake_body_turn_down_right.png': create_turn_sprite_down_right(),
-        'snake_body_turn_down_left.png': create_turn_sprite_down_left()
+        'snake_body_turn_down_left.png': create_turn_sprite_down_left(),
+        'snake_body_turn_right_up.png': create_turn_sprite_up_right(),
+        'snake_body_turn_left_up.png': create_turn_sprite_up_left(),
+        'snake_body_turn_right_down.png': create_turn_sprite_down_right(),
+        'snake_body_turn_left_down.png': create_turn_sprite_down_left()
     }
     
     for filename, surface in turn_sprites.items():
-        file_path = assets_dir / filename
-        pygame.image.save(surface, str(file_path))
-        print(f"Recreated and saved: {filename}")
+        file_path = os.path.join(base_dir, filename)
+        pygame.image.save(surface, file_path)
+        print(f"Sprite regenerado: {filename}")
 
 def create_default_sprites():
-    from pathlib import Path
-    assets_dir = Path('assets')
-    assets_dir.mkdir(exist_ok=True)
+    """Crea los sprites por defecto si no existen en la carpeta de assets"""
+    base_dir = resource_path('assets/img')
+    os.makedirs(base_dir, exist_ok=True)
+    
     sprites_to_create = {
         'snake_head.png': lambda: create_head_sprite(),
         'snake_body.png': lambda: create_body_sprite(GREEN),
@@ -48,13 +61,24 @@ def create_default_sprites():
         'snake_body_turn_up_right.png': lambda: create_turn_sprite_up_right(),
         'snake_body_turn_up_left.png': lambda: create_turn_sprite_up_left(),
         'snake_body_turn_down_right.png': lambda: create_turn_sprite_down_right(),
-        'snake_body_turn_down_left.png': lambda: create_turn_sprite_down_left()
+        'snake_body_turn_down_left.png': lambda: create_turn_sprite_down_left(),
+        'snake_body_turn_right_up.png': lambda: create_turn_sprite_up_right(),
+        'snake_body_turn_left_up.png': lambda: create_turn_sprite_up_left(),
+        'snake_body_turn_right_down.png': lambda: create_turn_sprite_down_right(),
+        'snake_body_turn_left_down.png': lambda: create_turn_sprite_down_left()
     }
+    
+    sprites_created = False
     for filename, create_func in sprites_to_create.items():
-        file_path = assets_dir / filename
-        if not file_path.exists():
+        file_path = os.path.join(base_dir, filename)
+        if not os.path.exists(file_path):
             surface = create_func()
-            pygame.image.save(surface, str(file_path))
+            pygame.image.save(surface, file_path)
+            sprites_created = True
+            print(f"Sprite creado: {filename}")
+    
+    if sprites_created:
+        print("Se han creado los sprites por defecto en game/assets/img/")
 
 def create_head_sprite():
     surface = pygame.Surface((GRID_SIZE, GRID_SIZE), pygame.SRCALPHA)
@@ -174,39 +198,44 @@ def create_turn_sprite_down_left():
     return surface
 
 def load_sprites():
-    import os
+    """Carga o genera todos los sprites necesarios para el juego"""
     global SPRITES
+    
+    # Definir todos los sprites necesarios y sus rutas
     sprites_paths = {
-        'head': os.path.join('assets', 'img', 'snake_head.png'),
-        'body': os.path.join('assets', 'img', 'snake_body.png'),
-        'body_h': os.path.join('assets', 'img', 'snake_body_h.png'),
-        'body_v': os.path.join('assets', 'img', 'snake_body_v.png'),
-        'tail': os.path.join('assets', 'img', 'snake_tail.png'),
-        'food': os.path.join('assets', 'img', 'food.png'),
-        # Solo los 4 giros originales, los 8 nuevos se agregan abajo
-        'body_turn_up_right': os.path.join('assets', 'img', 'snake_body_turn_up_right.png'),
-        'body_turn_up_left': os.path.join('assets', 'img', 'snake_body_turn_up_left.png'),
-        'body_turn_down_right': os.path.join('assets', 'img', 'snake_body_turn_down_right.png'),
-        'body_turn_down_left': os.path.join('assets', 'img', 'snake_body_turn_down_left.png'),
-    }
-    # Agregar los 8 sprites de giro extendidos
-    sprites_paths.update(SPRITES_PATHS_EXTRA_TURNS)
+        'head': 'snake_head.png',
+        'body': 'snake_body.png',
+        'body_h': 'snake_body_h.png',
+        'body_v': 'snake_body_v.png',
+        'tail': 'snake_tail.png',
+        'food': 'food.png',
+        'body_turn_up_right': 'snake_body_turn_up_right.png',
+        'body_turn_up_left': 'snake_body_turn_up_left.png',
+        'body_turn_down_right': 'snake_body_turn_down_right.png',
+        'body_turn_down_left': 'snake_body_turn_down_left.png',
+        'body_turn_right_up': 'snake_body_turn_right_up.png',
+        'body_turn_left_up': 'snake_body_turn_left_up.png',
+        'body_turn_right_down': 'snake_body_turn_right_down.png',
+        'body_turn_left_down': 'snake_body_turn_left_down.png'
+    }    # Colores de depuración para las curvas
     turn_debug_colors = {
-        'body_turn_up_right': (255, 0, 0),
-        'body_turn_up_left': (0, 255, 0),
-        'body_turn_down_right': (0, 0, 255),
-        'body_turn_down_left': (255, 255, 0),
-        # Colores para los nuevos
-        'body_turn_right_up': (255, 128, 128),
-        'body_turn_left_up': (128, 255, 128),
-        'body_turn_right_down': (128, 128, 255),
-        'body_turn_left_down': (255, 255, 128),
+        'body_turn_up_right': (255, 0, 0),      # Rojo
+        'body_turn_up_left': (0, 255, 0),       # Verde
+        'body_turn_down_right': (0, 0, 255),    # Azul
+        'body_turn_down_left': (255, 255, 0),   # Amarillo
+        'body_turn_right_up': (255, 128, 128),  # Rosa
+        'body_turn_left_up': (128, 255, 128),   # Verde claro
+        'body_turn_right_down': (128, 128, 255),# Azul claro
+        'body_turn_left_down': (255, 255, 128)  # Amarillo claro
     }
-    for name, path in sprites_paths.items():
+
+    # Cargar o generar cada sprite
+    for name, filename in sprites_paths.items():
+        full_path = resource_path(os.path.join(IMG_DIR, filename))
         try:
-            sprite = pygame.image.load(path).convert_alpha()
+            sprite = pygame.image.load(full_path).convert_alpha()
             SPRITES[name] = pygame.transform.scale(sprite, (GRID_SIZE, GRID_SIZE))
-        except pygame.error:
+        except (pygame.error, FileNotFoundError):
             surface = pygame.Surface((GRID_SIZE, GRID_SIZE), pygame.SRCALPHA)
             if name == 'head':
                 pygame.draw.circle(surface, YELLOW, (GRID_SIZE//2, GRID_SIZE//2), GRID_SIZE//2)

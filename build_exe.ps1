@@ -1,58 +1,128 @@
-# build_exe.ps1
-# Script de PowerShell para compilar el juego Snake a un .exe con icono personalizado y crear un instalador autoextraíble
+# build_exe.ps1 - Compila el juego Snake a .exe y crea un instalador portable
 
-# Cambia el nombre del icono aquí si usas otro
+# CONFIGURACIÓN
 $icon = "snake.ico"
 $main = "game/main.py"
+$assetsPath = "game/assets"
+$distPath = "dist"
+$exeName = "Snake Game-DevCreador.exe"
+$portableFolder = "snake_portable"
+$rarCommentFile = "comment.txt"   # Contiene configuración del extractor WinRAR
+$installerName = "Snake Game-DevCreador.exe"
+$installerPath = Join-Path $distPath $installerName
 
-# Verifica que el icono existe
+# COMPROBACIONES INICIALES
 if (!(Test-Path $icon)) {
-    Write-Host "[ERROR] No se encontró el icono $icon. Coloca el archivo .ico en la raíz del proyecto."
+    Write-Host "[ERROR] No se encontró el icono '$icon'. Coloca el archivo .ico en la raíz del proyecto." -ForegroundColor Red
+    exit 1
+}
+if (!(Test-Path $main)) {
+    Write-Host "[ERROR] No se encontró el archivo principal '$main'. Revisa la ruta." -ForegroundColor Red
+    exit 1
+}
+if (!(Test-Path $assetsPath)) {
+    Write-Host "[ERROR] No se encontró la carpeta de assets '$assetsPath'." -ForegroundColor Red
     exit 1
 }
 
-# Instala pyinstaller si no está instalado
-if (-not (pip show pyinstaller 2>$null)) {
+# INSTALAR PYINSTALLER SI FALTA
+Write-Host "Verificando PyInstaller..."
+if (-not (Get-Command pyinstaller -ErrorAction SilentlyContinue)) {
     Write-Host "Instalando pyinstaller..."
-    pip install pyinstaller
+    try {
+        pip install pyinstaller
+    }
+    catch {
+        Write-Host "[ERROR] Falló la instalación de PyInstaller. Asegúrate de que pip esté en tu PATH." -ForegroundColor Red
+        exit 1
+    }
+}
+else {
+    Write-Host "PyInstaller ya está instalado."
 }
 
-# Ejecuta pyinstaller
-Write-Host "Compilando $main a .exe con icono $icon..."
-pyinstaller --onefile --windowed --icon=$icon $main
 
-Write-Host "\n¡Compilación finalizada! El ejecutable está en la carpeta dist/"
+# EMPAQUETADO CON PYINSTALLER
+Write-Host "Compilando $main a .exe..."
+try {
+    # Asegúrate de que los paths sean absolutos o relativos al script si es necesario
+    # PyInstaller requiere paths absolutos para --add-data si el script se ejecuta desde otro directorio
+    $fullAssetsPath = (Resolve-Path $assetsPath).Path
+    $fullMainPath = (Resolve-Path $main).Path
 
-# Prepara carpeta portable
-$distPath = Join-Path -Path $PSScriptRoot -ChildPath "dist"
-$portablePath = Join-Path -Path $distPath -ChildPath "snake_portable"
-$exeName = "main.exe"
-$exePath = Join-Path -Path $distPath -ChildPath $exeName
+    pyinstaller --noconfirm --onefile --windowed --icon=$icon --add-data "$fullAssetsPath;game/assets" $fullMainPath
+}
+catch {
+    Write-Host "[ERROR] Falló la compilación con PyInstaller." -ForegroundColor Red
+    Write-Host $_.Exception.Message -ForegroundColor Red
+    exit 1
+}
 
-# Limpia carpeta portable si existe
+
+# VERIFICAR EJECUTABLE
+$exePath = Join-Path $distPath $exeName
+if (!(Test-Path $exePath)) {
+    Write-Host "[ERROR] Falló la compilación. El archivo '$exeName' no fue generado." -ForegroundColor Red
+    exit 1
+}
+else {
+    Write-Host "✅ Ejecutable '$exeName' generado exitosamente." -ForegroundColor Green
+}
+
+# CREAR CARPETA PORTABLE
+$portablePath = Join-Path $distPath $portableFolder
+Write-Host "Creando carpeta portable en '$portablePath'..."
 if (Test-Path $portablePath) { Remove-Item -Path $portablePath -Recurse -Force }
 New-Item -ItemType Directory -Path $portablePath | Out-Null
 
-# Copia el .exe
-Copy-Item -Path $exePath -Destination $portablePath
-# Copia la carpeta game completa (incluye assets y código fuente, sin __pycache__)
-Copy-Item -Path "game" -Destination $portablePath -Recurse
-Remove-Item -Path "$portablePath/game/__pycache__" -Recurse -Force -ErrorAction SilentlyContinue
+# COPIAR EJECUTABLE
+Write-Host "Copiando ejecutable a la carpeta portable..."
+Copy-Item -Path $exePath -Destination $portablePath -Force
 
-# Crea el instalador autoextraíble usando 7-Zip (debe estar en el PATH)
-$installerName = "snake_installer.exe"
-$installerPath = Join-Path -Path $distPath -ChildPath $installerName
+# ======================
+# CREAR INSTALADOR AUTOEXTRAÍBLE CON WINRAR
+# ======================
 
-if (Get-Command 7z -ErrorAction SilentlyContinue) {
-    Write-Host "Creando instalador autoextraíble..."
-    Push-Location $distPath
-    7z a -r -sfx"C:\Program Files\7-Zip\7z.sfx" $installerName "snake_portable/*"
-    Pop-Location
-    Write-Host "\n¡Instalador creado! Ejecuta $installerName y elige la carpeta de destino para extraer el juego."
-    Write-Host "Puedes borrar la carpeta snake_portable si lo deseas."
-} else {
-    Write-Host "[ADVERTENCIA] 7-Zip no está instalado o no está en el PATH. Instala 7-Zip y agrega '7z' al PATH para crear el instalador autoextraíble."
-    Write-Host "El juego portable está en dist/snake_portable/"
+# Verificar WinRAR en rutas comunes
+$winrarPath = ""
+$winrarFound = $false
+
+if (Test-Path "${env:ProgramFiles}\WinRAR\WinRAR.exe") {
+    $winrarPath = "${env:ProgramFiles}\WinRAR\WinRAR.exe"
+    $winrarFound = $true
+}
+elseif (Test-Path "${env:ProgramFiles(x86)}\WinRAR\WinRAR.exe") {
+    $winrarPath = "${env:ProgramFiles(x86)}\WinRAR\WinRAR.exe"
+    $winrarFound = $true
 }
 
-Write-Host "\n¡Listo! Ejecuta el instalador o usa la carpeta portable para jugar."
+if($winrarFound){
+    Write-Host "📦 Creando instalador autoextraible con WinRAR..."
+    try {
+        # El comando de WinRAR debe ser ejecutado con el operador de llamada '&'
+        # Asegúrate de que el archivo 'comment.txt' exista y tenga el contenido deseado para la configuración SFX
+        & "$winrarPath" a -r -sfx -z"$rarCommentFile" -iicon"$icon" "$installerPath" "$portablePath\*"
+
+        Write-Host "✅ ¡Instalador WinRAR creado exitosamente! Ejecuta '$installerName' para instalar el juego." -ForegroundColor Green
+    }
+    catch {
+        Write-Host "[ERROR] Fallo la creacion del instalador WinRAR." -ForegroundColor Red
+        Write-Host $_.Exception.Message -ForegroundColor Red
+    }
+}
+else {
+    Write-Host "[ADVERTENCIA] No se encontro WinRAR en el sistema. No se pudo crear el instalador autoextraible." -ForegroundColor Yellow
+    Write-Host "Puedes distribuir la carpeta '$portableFolder' manualmente o usar 7-Zip si lo prefieres."
+}
+
+# ======================
+# LIMPIEZA FINAL
+# ======================
+Write-Host "🧹 Limpiando archivos temporales..."
+Remove-Item "build" -Recurse -Force -ErrorAction SilentlyContinue
+Remove-Item "$distPath\$exeName" -Force -ErrorAction SilentlyContinue
+Remove-Item "$distPath\snake_portable" -Recurse -Force -ErrorAction SilentlyContinue
+Remove-Item "*.spec" -Force -ErrorAction SilentlyContinue
+
+Write-Host "🎮 ¡Listo! El ejecutable esta en '$distPath\$portableFolder'." -ForegroundColor Cyan
+

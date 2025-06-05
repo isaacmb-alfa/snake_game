@@ -1,0 +1,7 @@
+;The comment below contains SFX script commands
+Path=SnakePortable
+SavePath
+Setup="Snake Game-DevCreador.exe"
+Silent=0
+Overwrite=1
+Title=Snake Game - DevCreador

@@ -4,6 +4,8 @@ dist/
 snake_portable/
 __pycache__/
 *.pyc
+snake_portable
+.qodo
 
 # Ignorar archivos de PyInstaller
 *.spec
@@ -13,8 +15,12 @@ __pycache__/
 Thumbs.db
 
 # Ignorar entornos virtuales (si usas)
+.venv
 venv/
 .env/
 
 # Ignorar backups o copias
 assets-copia/
+
+.vscode
+.vs

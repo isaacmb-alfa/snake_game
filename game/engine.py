@@ -1,4 +1,7 @@
+import sys
+from resource_util import resource_path
 import pygame
+import os
 from snake.config import WIDTH, HEIGHT, SNAKE_SPEED, BLACK, WHITE, UP, DOWN, LEFT, RIGHT
 from snake.sprites import load_sprites
 from snake.snake import Snake
@@ -8,7 +11,18 @@ from assets import load_font, load_image, load_tile
 from start_menu.start_menu import StartMenu
 from ui_pause_menu.pause_menu import PauseMenu
 
+
 def run_game():
+    
+
+
+    print("[DEBUG] Carpeta actual:", os.getcwd())
+    print("[DEBUG] __file__:", __file__)
+    print("[DEBUG] Ruta MEIPASS si existe:", getattr(sys, "_MEIPASS", "No existe"))
+    ruta = resource_path("game/assets/player.png")
+    print("[DEBUG] ¿Existe player.png?", os.path.exists(ruta))
+    print("[DEBUG] Ruta completa:", ruta)
+    # Inicializar Pygame
     pygame.init()
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -57,6 +71,8 @@ def run_game():
         LEFT: pygame.K_LEFT,
         RIGHT: pygame.K_RIGHT
     }
+    #para debugging
+    # input("\nPresiona ENTER para salir...")
 
     while True:
         for event in pygame.event.get():
