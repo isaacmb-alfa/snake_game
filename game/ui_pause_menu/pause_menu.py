@@ -1,7 +1,7 @@
 import pygame
 import math
 import random
-from snake.config import WIDTH, HEIGHT
+from ..snake.config import WIDTH, HEIGHT
 
 class PauseMenuButton:
     def __init__(self, rect, color, label, font, action):

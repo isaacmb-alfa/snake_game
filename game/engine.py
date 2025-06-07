@@ -1,15 +1,15 @@
 import sys
-from resource_util import resource_path
 import pygame
 import os
-from snake.config import WIDTH, HEIGHT, SNAKE_SPEED, BLACK, WHITE, UP, DOWN, LEFT, RIGHT
-from snake.sprites import load_sprites
-from snake.snake import Snake
-from snake.food import Food
-from ui import draw_score, draw_pause_overlay, draw_game_over_overlay, draw_pause_button, get_score_color
-from assets import load_font, load_image, load_tile
-from start_menu.start_menu import StartMenu
-from ui_pause_menu.pause_menu import PauseMenu
+from .resource_util import resource_path
+from .snake.config import WIDTH, HEIGHT, SNAKE_SPEED, BLACK, WHITE, UP, DOWN, LEFT, RIGHT
+from .snake.sprites import load_sprites
+from .snake.snake import Snake
+from .snake.food import Food
+from .ui import draw_score, draw_pause_overlay, draw_game_over_overlay, draw_pause_button, get_score_color
+from .assets import load_font, load_image, load_tile
+from .start_menu.start_menu import StartMenu
+from .ui_pause_menu.pause_menu import PauseMenu
 
 
 def run_game():

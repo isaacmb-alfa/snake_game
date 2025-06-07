@@ -1,6 +1,6 @@
 import pygame
-from .config import WIDTH, WHITE
-from assets import load_tile
+from ..snake.config import WIDTH, WHITE
+from ..assets import load_tile
 
 class BgSelector:
     def __init__(self, menu_font, bg_options):

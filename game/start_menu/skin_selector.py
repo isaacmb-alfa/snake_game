@@ -1,6 +1,6 @@
 import pygame
-from .config import WIDTH, WHITE, BLACK
-from snake.sprites import SPRITES, load_sprites
+from ..snake.config import WIDTH, WHITE, BLACK
+from ..snake.sprites import SPRITES, load_sprites
 
 class SkinSelector:
     def __init__(self, menu_font, snake_skins):

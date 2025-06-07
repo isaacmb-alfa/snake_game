@@ -1,5 +1,5 @@
 import pygame
-from resource_util import resource_path
+from .resource_util import resource_path
 
 def load_font(path, size, fallback=None):
     font_path = resource_path(path)

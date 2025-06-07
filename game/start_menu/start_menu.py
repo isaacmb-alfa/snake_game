@@ -1,13 +1,14 @@
 import pygame
 import sys
-from snake.config import WIDTH, HEIGHT, WHITE, BLACK, GREEN, YELLOW
-from assets import load_font, load_image
+from ..snake.config import WIDTH, HEIGHT, WHITE, BLACK, GREEN, YELLOW
+from ..assets import load_font, load_image
 from .title import StartMenuTitle
 from .level_selector import LevelSelector
 from .toggle_option import ToggleOption
 from .music_slider import MusicSlider
 from .bg_selector import BgSelector
 from .skin_selector import SkinSelector
+from .footer import draw_footer
 
 class StartMenu:
     def __init__(self):
@@ -56,8 +57,7 @@ class StartMenu:
         btn_text = self.toggle_option.menu_font.render('Iniciar', True, WHITE)
         btn_rect = btn_text.get_rect(center=self.button_rect.center)
         screen.blit(btn_text, btn_rect)
-        footer = self.footer_font.render(f'{WIDTH}x{HEIGHT}  |  Desarrollado por DevCreador ®', True, (180,180,180))
-        screen.blit(footer, (WIDTH//2 - footer.get_width()//2, HEIGHT-40))
+        draw_footer(screen, self.footer_font)
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:

@@ -2,7 +2,7 @@ import pygame
 import os
 import sys
 try:
-    from game.resource_util import resource_path
+    from ..resource_util import resource_path
 except ImportError:
     from resource_util import resource_path
 from .config import GRID_SIZE, GREEN, YELLOW, WHITE, RED

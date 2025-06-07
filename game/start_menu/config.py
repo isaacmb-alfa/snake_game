@@ -1,6 +1,6 @@
 import pygame
-from snake.config import WIDTH, HEIGHT, WHITE, BLACK, GREEN, YELLOW
-from assets import load_font
+from ..snake.config import WIDTH, HEIGHT, WHITE, BLACK, GREEN, YELLOW
+from ..assets import load_font
 
 class StartMenuConfig:
     def __init__(self):

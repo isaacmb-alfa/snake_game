@@ -6,7 +6,7 @@ from pathlib import Path
 
 # === CONFIGURACIÓN ===
 icon = "snake.ico"
-main = "game/main.py"
+main = "launcher.py"
 assets = "game/assets"
 dist = Path("dist")
 exe_name = "Snake Game-DevCreador.exe"
