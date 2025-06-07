@@ -1,4 +1,5 @@
 import pygame
+import sys
 from snake.config import WIDTH, HEIGHT, WHITE, BLACK, GREEN, YELLOW
 from assets import load_font, load_image
 from .title import StartMenuTitle
@@ -86,7 +87,7 @@ class StartMenu:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    exit()
+                    sys.exit()
                 self.handle_event(event)
             self.update()
             self.draw(screen)
